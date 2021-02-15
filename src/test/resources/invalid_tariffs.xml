@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<tariffs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://www.example.com/tariffs"
+         xsi:schemaLocation="http://www.example.com/tariffs tariffs.xsd">
+
+    <tariff name="NoMonthlyFee">
+        <operatorName>T-Mobile</operatorName>
+        <prices>
+            <callToThisOperator>12</callToThisOperator>
+            <callToOtherOperators>22</callToOtherOperators>
+        </prices>
+        <connectionFee>20</connectionFee>
+        <tariffication>12 seconds</tariffication>
+    </tariff>
+
+    <tariffWithMonthlyFee name="WithFee" monthlyFee="50">
+        <operatorName>T-Mobile</operatorName>
+        <prices>
+            <callToThisOperator>10</callToThisOperator>
+            <callToOtherOperators>20</callToOtherOperators>
+            <callToStationary>test</callToStationary>
+            <sms>11</sms>
+        </prices>
+        <connectionFee>35</connectionFee>
+        <tariffication>hour</tariffication>
+    </tariffWithMonthlyFee>
+
+</tariffs>
