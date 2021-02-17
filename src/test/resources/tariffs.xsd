@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://www.example.com/tariffs"
+        xmlns:tns="http://www.example.com/tariffs"
+        elementFormDefault="qualified">
+
+    <element name="tariff" type="tns:Tariff" />
+    <element name="tariffWithMonthlyFee" type="tns:TariffWithMonthlyFee" substitutionGroup="tns:tariff" />
+
+    <element name="tariffs">
+        <complexType>
+            <sequence>
+                <element ref="tns:tariff"
+                         maxOccurs="unbounded" />
+            </sequence>
+        </complexType>
+    </element>
+
+    <complexType name="Tariff">
+        <sequence>
+            <element name="operatorName" type="string" />
+            <element name="prices" type="tns:Prices"/>
+            <element name="connectionFee" type="nonNegativeInteger" />
+            <element name="tariffication">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="15 seconds" />
+                        <enumeration value="minute" />
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+        <attribute name="name" type="string" use="required" />
+    </complexType>
+
+    <complexType name="TariffWithMonthlyFee">
+        <complexContent>
+            <extension base="tns:Tariff">
+                <attribute name="monthlyFee" type="nonNegativeInteger" use="required" />
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="Prices">
+        <sequence>
+            <element name="callToThisOperator" type="nonNegativeInteger" />
+            <element name="callToOtherOperators" type="nonNegativeInteger" />
+            <element name="callToStationary" type="nonNegativeInteger" />
+            <element name="sms" type="nonNegativeInteger" />
+        </sequence>
+    </complexType>
+
+</schema>
