@@ -3,8 +3,6 @@ package com.epam.task.fourth.parser;
 import com.epam.task.fourth.entity.Tariff;
 import com.epam.task.fourth.entity.TariffPrices;
 import com.epam.task.fourth.entity.TariffWithMonthlyFee;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -20,16 +18,15 @@ import java.util.List;
 
 public class DomParser implements XmlParser {
 
-    private static final Logger LOGGER = LogManager.getLogger(XmlParser.class);
-
-    private final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
     public DomParser() {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     }
 
     @Override
     public List<Tariff> parse(String filename) throws ParserException {
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
         Document document;
 
         try {
@@ -40,7 +37,7 @@ public class DomParser implements XmlParser {
             document = builder.parse(filename);
             Element root = document.getDocumentElement();
 
-            NodeList tariffList = root.getElementsByTagName("tariff");
+            NodeList tariffList = root.getElementsByTagName(XmlTagConstants.TARIFF);
 
             for (int i = 0; i < tariffList.getLength(); ++i) {
                 Element tariffElement = (Element) tariffList.item(i);
@@ -48,7 +45,7 @@ public class DomParser implements XmlParser {
                 tariffs.add(tariff);
             }
 
-            NodeList tariffWithMonthlyFeeList = root.getElementsByTagName("tariffWithMonthlyFee");
+            NodeList tariffWithMonthlyFeeList = root.getElementsByTagName(XmlTagConstants.TARIFF_WITH_MONTHLY_FEE);
 
             for (int i = 0; i < tariffWithMonthlyFeeList.getLength(); ++i) {
                 Element tariffElement = (Element) tariffWithMonthlyFeeList.item(i);
@@ -59,7 +56,6 @@ public class DomParser implements XmlParser {
             return tariffs;
 
         } catch (SAXException | IOException | ParserConfigurationException e) {
-            LOGGER.error(e.getMessage(), e);
             throw new ParserException(e);
         }
     }
@@ -67,10 +63,10 @@ public class DomParser implements XmlParser {
     private Tariff buildTariff(Element element) {
         Tariff tariff;
 
-        if (element.hasAttribute("monthlyFee")) {
+        if (element.hasAttribute(XmlTagConstants.MONTHLY_FEE)) {
             tariff = new TariffWithMonthlyFee();
 
-            String monthlyFeeTextContent = element.getAttribute("monthlyFee");
+            String monthlyFeeTextContent = element.getAttribute(XmlTagConstants.MONTHLY_FEE);
             int monthlyFee = Integer.parseInt(monthlyFeeTextContent);
             ((TariffWithMonthlyFee) tariff).setMonthlyFee(monthlyFee);
 
@@ -78,25 +74,25 @@ public class DomParser implements XmlParser {
             tariff = new Tariff();
         }
 
-        tariff.setName(element.getAttribute("name"));
-        tariff.setOperatorName(getElementTextContent(element, "operatorName"));
+        tariff.setName(element.getAttribute(XmlTagConstants.NAME));
+        tariff.setOperatorName(getElementTextContent(element, XmlTagConstants.OPERATOR_NAME));
 
         tariff.setPrices(getPrices(element));
 
-        tariff.setConnectionFee(getElementIntContent(element, "connectionFee"));
+        tariff.setConnectionFee(getElementIntContent(element, XmlTagConstants.CONNECTION_FEE));
 
         return tariff;
     }
 
     private TariffPrices getPrices(Element element) {
-        Element pricesElement = (Element) element.getElementsByTagName("prices").item(0);
+        Element pricesElement = (Element) element.getElementsByTagName(XmlTagConstants.PRICES).item(0);
 
         TariffPrices prices = new TariffPrices();
 
-        prices.setCallToThisOperator(getElementIntContent(pricesElement, "callToThisOperator"));
-        prices.setCallToOtherOperators(getElementIntContent(pricesElement, "callToOtherOperators"));
-        prices.setCallToStationary(getElementIntContent(pricesElement, "callToStationary"));
-        prices.setSms(getElementIntContent(pricesElement, "sms"));
+        prices.setCallToThisOperator(getElementIntContent(pricesElement, XmlTagConstants.CALL_TO_THIS_OPERATOR));
+        prices.setCallToOtherOperators(getElementIntContent(pricesElement, XmlTagConstants.CALL_TO_OTHER_OPERATORS));
+        prices.setCallToStationary(getElementIntContent(pricesElement, XmlTagConstants.CALL_TO_STATIONARY));
+        prices.setSms(getElementIntContent(pricesElement, XmlTagConstants.SMS));
 
         return prices;
     }

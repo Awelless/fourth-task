@@ -21,10 +21,11 @@ public class StaxParser implements XmlParser {
 
     private static final Logger LOGGER = LogManager.getLogger(XmlParser.class);
 
-    private final XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-
     @Override
     public List<Tariff> parse(String filename) throws ParserException {
+
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+
         FileInputStream inputStream = null;
 
         try {
@@ -49,7 +50,6 @@ public class StaxParser implements XmlParser {
             return tariffs;
 
         } catch (FileNotFoundException | XMLStreamException e) {
-            LOGGER.error(e.getMessage(), e);
             throw new ParserException(e);
 
         } finally {
@@ -66,7 +66,7 @@ public class StaxParser implements XmlParser {
     private Tariff buildTariff(XMLStreamReader reader) throws XMLStreamException {
         Tariff tariff;
 
-        String monthlyFeeTextContent = reader.getAttributeValue(null, "monthlyFee");
+        String monthlyFeeTextContent = reader.getAttributeValue(null, XmlTagConstants.MONTHLY_FEE);
 
         if (monthlyFeeTextContent != null) {
             tariff = new TariffWithMonthlyFee();
@@ -77,7 +77,7 @@ public class StaxParser implements XmlParser {
             tariff = new Tariff();
         }
 
-        tariff.setName(reader.getAttributeValue(null, "name"));
+        tariff.setName(reader.getAttributeValue(null, XmlTagConstants.NAME));
 
         while (reader.hasNext()) {
             int type = reader.next();
@@ -85,27 +85,7 @@ public class StaxParser implements XmlParser {
 
             switch (type) {
                 case XMLStreamConstants.START_ELEMENT:
-                    name = reader.getLocalName();
-                    String text;
-
-                    switch (name) {
-                        case "operatorName":
-                            tariff.setOperatorName(getText(reader));
-                            break;
-                        case "prices":
-                            tariff.setPrices(getPrices(reader));
-                            break;
-                        case "connectionFee":
-                            text = getText(reader);
-                            if (text != null) {
-                                tariff.setConnectionFee(Integer.parseInt(text));
-                            }
-                            break;
-                        case "tariffication":
-                            text = getText(reader);
-                            TarifficationType tarifficationType = TarifficationType.getByString(text);
-                            tariff.setType(tarifficationType);
-                    }
+                    processStartElement(reader, tariff);
                     break;
 
                 case XMLStreamConstants.END_ELEMENT:
@@ -120,8 +100,33 @@ public class StaxParser implements XmlParser {
         return tariff;
     }
 
+    private void processStartElement(XMLStreamReader reader, Tariff tariff) throws XMLStreamException {
+        String name = reader.getLocalName();
+        String text;
+
+        switch (name) {
+            case XmlTagConstants.OPERATOR_NAME:
+                tariff.setOperatorName(getText(reader));
+                break;
+            case XmlTagConstants.PRICES:
+                tariff.setPrices(getPrices(reader));
+                break;
+            case XmlTagConstants.CONNECTION_FEE:
+                text = getText(reader);
+                if (text != null) {
+                    tariff.setConnectionFee(Integer.parseInt(text));
+                }
+                break;
+            case XmlTagConstants.TARIFFICATION:
+                text = getText(reader);
+                TarifficationType tarifficationType = TarifficationType.getByString(text);
+                tariff.setType(tarifficationType);
+        }
+    }
+
     private boolean isTariff(String name) {
-        return "tariff".equals(name) || "tariffWithMonthlyFee".equals(name);
+        return XmlTagConstants.TARIFF.equals(name) ||
+               XmlTagConstants.TARIFF_WITH_MONTHLY_FEE.equals(name);
     }
 
     private TariffPrices getPrices(XMLStreamReader reader) throws XMLStreamException {
@@ -140,16 +145,16 @@ public class StaxParser implements XmlParser {
                         int cost = Integer.parseInt(text);
 
                         switch (name) {
-                            case "callToThisOperator":
+                            case XmlTagConstants.CALL_TO_THIS_OPERATOR:
                                 prices.setCallToThisOperator(cost);
                                 break;
-                            case "callToOtherOperators":
+                            case XmlTagConstants.CALL_TO_OTHER_OPERATORS:
                                 prices.setCallToOtherOperators(cost);
                                 break;
-                            case "callToStationary":
+                            case XmlTagConstants.CALL_TO_STATIONARY:
                                 prices.setCallToStationary(cost);
                                 break;
-                            case "sms":
+                            case XmlTagConstants.SMS:
                                 prices.setSms(cost);
                                 break;
                         }
@@ -157,7 +162,7 @@ public class StaxParser implements XmlParser {
                     break;
                 case XMLStreamConstants.END_ELEMENT:
                     name = reader.getLocalName();
-                    if ("prices".equals(name)) {
+                    if (XmlTagConstants.PRICES.equals(name)) {
                         return prices;
                     }
             }

@@ -2,8 +2,6 @@ package com.epam.task.fourth.parser;
 
 import com.epam.task.fourth.entity.Tariff;
 import com.epam.task.fourth.entity.Tariffs;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -12,8 +10,6 @@ import java.io.File;
 import java.util.List;
 
 public class JaxbParser implements XmlParser {
-
-    private static final Logger LOGGER = LogManager.getLogger(XmlParser.class);
 
     @Override
     public List<Tariff> parse(String filename) throws ParserException {
@@ -26,7 +22,6 @@ public class JaxbParser implements XmlParser {
             return tariffs.getTariffs();
 
         } catch (JAXBException e) {
-            LOGGER.error(e.getMessage(), e);
             throw new ParserException(e);
         }
     }
