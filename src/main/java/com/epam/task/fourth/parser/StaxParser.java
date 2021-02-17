@@ -24,7 +24,7 @@ public class StaxParser implements XmlParser {
     private final XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 
     @Override
-    public List<Tariff> parse(String filename) throws ParsingException {
+    public List<Tariff> parse(String filename) throws ParserException {
         FileInputStream inputStream = null;
 
         try {
@@ -50,7 +50,7 @@ public class StaxParser implements XmlParser {
 
         } catch (FileNotFoundException | XMLStreamException e) {
             LOGGER.error(e.getMessage(), e);
-            throw new ParsingException(e);
+            throw new ParserException(e);
 
         } finally {
             try {

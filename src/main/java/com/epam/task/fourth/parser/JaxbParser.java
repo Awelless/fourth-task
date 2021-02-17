@@ -16,7 +16,7 @@ public class JaxbParser implements XmlParser {
     private static final Logger LOGGER = LogManager.getLogger(XmlParser.class);
 
     @Override
-    public List<Tariff> parse(String filename) throws ParsingException {
+    public List<Tariff> parse(String filename) throws ParserException {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(Tariffs.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
@@ -27,7 +27,7 @@ public class JaxbParser implements XmlParser {
 
         } catch (JAXBException e) {
             LOGGER.error(e.getMessage(), e);
-            throw new ParsingException(e);
+            throw new ParserException(e);
         }
     }
 }

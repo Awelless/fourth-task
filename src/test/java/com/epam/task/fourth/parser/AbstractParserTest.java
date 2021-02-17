@@ -35,7 +35,7 @@ public abstract class AbstractParserTest {
     }
 
     @Test
-    public void testParseShouldParseWhenCorrectApplied() throws ParsingException {
+    public void testParseShouldParseWhenCorrectApplied() throws ParserException {
         List<Tariff> result = parser.parse(CORRECT_XML);
 
         Assert.assertEquals(EXPECTED, result);

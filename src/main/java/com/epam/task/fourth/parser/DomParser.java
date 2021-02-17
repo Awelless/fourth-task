@@ -22,23 +22,19 @@ public class DomParser implements XmlParser {
 
     private static final Logger LOGGER = LogManager.getLogger(XmlParser.class);
 
-    private DocumentBuilder builder;
+    private final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
     public DomParser() {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-        try {
-            builder = factory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
     }
 
     @Override
-    public List<Tariff> parse(String filename) throws ParsingException {
+    public List<Tariff> parse(String filename) throws ParserException {
         Document document;
 
         try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
             List<Tariff> tariffs = new ArrayList<>();
 
             document = builder.parse(filename);
@@ -62,9 +58,9 @@ public class DomParser implements XmlParser {
 
             return tariffs;
 
-        } catch (SAXException | IOException e) {
+        } catch (SAXException | IOException | ParserConfigurationException e) {
             LOGGER.error(e.getMessage(), e);
-            throw new ParsingException(e);
+            throw new ParserException(e);
         }
     }
 
